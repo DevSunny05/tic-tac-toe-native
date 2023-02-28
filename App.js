@@ -1,166 +1,171 @@
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import { Alert, ImageBackground, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import bg from "./assets/bg.jpeg";
+import Cell from "./src/component/Cell";
+import Cross from "./src/component/Cross";
 
-const emptyMap=[
+const emptyMap = [
   ["", "", ""],
   ["", "", ""],
   ["", "", ""],
-]
+];
 
 export default function App() {
   const [map, setMap] = useState(emptyMap);
 
-  const [currentTurn,setCurrentTurn]=useState('X')
+  const [currentTurn, setCurrentTurn] = useState("X");
 
-  const onPress=(rowIndex,columnIndex)=>{
-    console.log(rowIndex,columnIndex)
-    if(map[rowIndex][columnIndex] !== ""){
-      Alert.alert("Position already occupied")
+  const onPress = (rowIndex, columnIndex) => {
+    console.log(rowIndex, columnIndex);
+    if (map[rowIndex][columnIndex] !== "") {
+      Alert.alert("Position already occupied");
       return;
     }
 
-    setMap((existingmap)=>{
-      const updatedmap=[...existingmap]
-      existingmap[rowIndex][columnIndex] = currentTurn
+    setMap((existingmap) => {
+      const updatedmap = [...existingmap];
+      existingmap[rowIndex][columnIndex] = currentTurn;
       return updatedmap;
-    })
+    });
 
-    setCurrentTurn(currentTurn=== 'X'? 'O':'X')
-    const winner=getWinner()
-    if(winner){
-      gameWon(winner)
-    }else{
-      checkTieSet()
+    setCurrentTurn(currentTurn === "X" ? "O" : "X");
+
+    const winner = getWinner();
+    if (winner) {
+      gameWon(winner);
+    } else {
+      checkTieSet();
     }
-    
-  }
-  const getWinner=()=>{
+  };
+  const getWinner = () => {
     // check row
-    for(let i=0; i<3;i++){
-      let isRowXWinning= map[i].every((cell)=>cell === 'X')
-      let isRowOWinning= map[i].every((cell)=>cell === 'O')
-      if(isRowXWinning){
-        return'X'
+    for (let i = 0; i < 3; i++) {
+      let isRowXWinning = map[i].every((cell) => cell === "X");
+      let isRowOWinning = map[i].every((cell) => cell === "O");
+      if (isRowXWinning) {
+        return "X";
       }
-      if(isRowOWinning){
-        return'O'
+      if (isRowOWinning) {
+        return "O";
       }
     }
 
     // check column
-    for(let col=0;col<3;col++){
-      let isColumnXWinner=true
-      let isColumnOWinner=true
-      for(let row=0; row<3;row++) {
-        if(map[row][col] !== 'X'){
-          isColumnXWinner=false
+    for (let col = 0; col < 3; col++) {
+      let isColumnXWinner = true;
+      let isColumnOWinner = true;
+      for (let row = 0; row < 3; row++) {
+        if (map[row][col] !== "X") {
+          isColumnXWinner = false;
         }
 
-        if(map[row][col] !== 'O'){
-          isColumnOWinner=false
+        if (map[row][col] !== "O") {
+          isColumnOWinner = false;
         }
-
       }
 
-      if(isColumnXWinner){
-        return'X'
-        
+      if (isColumnXWinner) {
+        return "X";
       }
-      if(isColumnOWinner){
-        return'O'
-        
+      if (isColumnOWinner) {
+        return "O";
       }
     }
 
     // diagonal
-    let isDiagonal1OWinning=true
-    let isDiagonal1XWinning=true
-    let isDiagonal2OWinning=true
-    let isDiagonal2XWinning=true
-    for(let i=0; i<3; i++){
-      if(map[i][i] !== 'O'){
-        isDiagonal1OWinning=false
+    let isDiagonal1OWinning = true;
+    let isDiagonal1XWinning = true;
+    let isDiagonal2OWinning = true;
+    let isDiagonal2XWinning = true;
+    for (let i = 0; i < 3; i++) {
+      if (map[i][i] !== "O") {
+        isDiagonal1OWinning = false;
       }
-      if(map[i][i] !== 'X'){
-        isDiagonal1XWinning=false
-      }
-
-      if(map[i][2-i] !== 'O'){
-        isDiagonal2OWinning=false
-      }
-      if(map[i][2-i] !== 'X'){
-        isDiagonal2XWinning=false
+      if (map[i][i] !== "X") {
+        isDiagonal1XWinning = false;
       }
 
-      
+      if (map[i][2 - i] !== "O") {
+        isDiagonal2OWinning = false;
+      }
+      if (map[i][2 - i] !== "X") {
+        isDiagonal2XWinning = false;
+      }
     }
     if (isDiagonal1OWinning || isDiagonal2OWinning) {
-      return'O'
+      return "O";
     }
     if (isDiagonal1XWinning || isDiagonal2XWinning) {
-      return'X'
+      return "X";
     }
-    
-  }
+  };
 
-  const checkTieSet=()=>{
-    if(!map.some((row)=>row.some((cell)=>cell ===""))){
-      Alert.alert(`Match Tied`,`tie`,[
+  const checkTieSet = () => {
+    if (!map.some((row) => row.some((cell) => cell === ""))) {
+      Alert.alert(`Match Tied`, `tie`, [
         {
-          text:'Reset',
-          onPress:resetGame
-        }
-      ])
+          text: "Reset",
+          onPress: resetGame,
+        },
+      ]);
     }
-   
-  }
+  };
 
-  const gameWon=(player)=>{
-    Alert.alert(`Hurrayy`,`Player ${player} won`,[
+  const gameWon = (player) => {
+    Alert.alert(`Hurrayy`, `Player ${player} won`, [
       {
-        text:'Reset',
-        onPress:resetGame
-      }
-    ])
-  }
+        text: "Reset",
+        onPress: resetGame,
+      },
+    ]);
+  };
 
-  const resetGame=()=>{
+  const resetGame = () => {
     setMap([
       ["", "", ""],
       ["", "", ""],
       ["", "", ""],
-    ])
-    setCurrentTurn('X')
-  }
+    ]);
+    setCurrentTurn("X");
+  };
   return (
     <View style={styles.container}>
       <ImageBackground source={bg} style={styles.bg} resizeMode="contain">
+        <Text
+          style={{
+            fontSize: 24,
+            color: "white",
+            marginTop: 50,
+            position: "absolute",
+            top: 50,
+          }}
+        >
+          Current Turn: {currentTurn}
+        </Text>
         <View style={styles.map}>
-          {map.map((row,rowIndex) => (
+          {map.map((row, rowIndex) => (
             <View key={`row-${rowIndex}`} style={styles.row}>
-              {row.map((cell,columnIndex) => (
-                <Pressable key={`row-${rowIndex}-col-${columnIndex}`} onPress={()=>onPress(rowIndex,columnIndex)} style={styles.cell}>
-                  {cell === "O" && <View style={styles.circle} />}
-                  {cell === "X" && (
-                    <View style={styles.cross}>
-                      <View style={styles.crossline} />
-                      <View
-                        style={[styles.crossline, styles.crosslineReverse]}
-                      />
-                    </View>
-                  )}
-                </Pressable>
+              {row.map((cell, columnIndex) => (
+                <Cell
+                  cell={cell}
+                  onPress={() => onPress(rowIndex, columnIndex)}
+                  key={`row-${rowIndex}-col-${columnIndex}`}
+                />
+                // <Pressable key={`row-${rowIndex}-col-${columnIndex}`} onPress={()=>onPress(rowIndex,columnIndex)} style={styles.cell}>
+                //   {cell === "O" && <View style={styles.circle} />}
+                //   {cell === "X" && <Cross/>}
+                // </Pressable>
               ))}
             </View>
           ))}
-
-          {/* <View style={styles.circle}/>
-              <View style={styles.cross} >
-                  <View style={styles.crossline}/>
-                  <View style={[styles.crossline,styles.crosslineReverse]}/>
-              </View> */}
         </View>
       </ImageBackground>
 
